@@ -20,6 +20,11 @@
       --green-glow: 0 0 40px rgba(0,255,136,0.15);
     }
 
+    html {
+      overflow-x: hidden;
+      max-width: 100vw;
+    }
+
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       background: var(--bg);
@@ -27,8 +32,10 @@
       overflow: hidden;
       height: 100vh;
       width: 100vw;
+      max-width: 100vw;
       cursor: default;
       -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
     }
 
     .deck { position: relative; width: 100vw; height: 100vh; }
@@ -67,7 +74,7 @@
 
     .divider { width: 60px; height: 3px; background: var(--green); border-radius: 2px; margin: 1.5rem auto; }
 
-    .gradient-orb { position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.15; pointer-events: none; }
+    .gradient-orb { position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.15; pointer-events: none; overflow: hidden; }
     .orb-green { width: 400px; height: 400px; background: var(--green); top: -100px; right: -100px; }
     .orb-red { width: 300px; height: 300px; background: var(--red); bottom: -80px; left: -80px; }
 
@@ -114,16 +121,17 @@
 
     /* ─── MOBILE FIRST: hasta 768px ─── */
     @media (max-width: 768px) {
-      body { overflow-y: auto; overflow-x: hidden; height: auto; }
-      .deck { height: auto; position: relative; }
+      html, body { overflow-x: hidden !important; max-width: 100vw !important; width: 100% !important; }
+      body { overflow-y: auto; height: auto; }
 
       .slide {
         position: relative; inset: auto;
         opacity: 1; visibility: visible;
-        padding: 10vh 7vw 8vh;
+        padding: 10vh 6vw 8vh;
         min-height: 100svh;
         min-height: 100vh;
         scroll-snap-align: start;
+        overflow: hidden;
       }
       .slide.active { opacity: 1; visibility: visible; }
 
@@ -133,10 +141,17 @@
       /* Scroll snap para que cada slide encaje */
       .deck {
         overflow-y: auto;
+        overflow-x: hidden;
         scroll-snap-type: y mandatory;
         height: 100vh;
+        width: 100%;
+        max-width: 100vw;
         -webkit-overflow-scrolling: touch;
+        position: relative;
       }
+
+      /* Orbs no deben causar overflow */
+      .gradient-orb { display: none; }
 
       /* Tipografia mas grande para mobile */
       h1 { font-size: 2rem; margin-bottom: 1rem; }
@@ -204,10 +219,7 @@
 
     .scroll-hint {
       display: none;
-      position: absolute;
-      bottom: 3vh;
-      left: 50%;
-      transform: translateX(-50%);
+      margin-top: 1.5rem;
       flex-direction: column;
       align-items: center;
       gap: 0.4rem;
