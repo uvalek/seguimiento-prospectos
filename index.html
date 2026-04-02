@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alek Agency — Resumen de Reunion</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #0a0a0a;
+      --text: #ffffff;
+      --green: #00ff88;
+      --red: #ff3333;
+      --dim: #888888;
+      --card-bg: rgba(255,255,255,0.04);
+      --card-border: rgba(255,255,255,0.08);
+      --green-glow: 0 0 40px rgba(0,255,136,0.15);
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+      cursor: default;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .deck { position: relative; width: 100vw; height: 100vh; }
+
+    .slide {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column; justify-content: center; align-items: center;
+      padding: 6vh 8vw; opacity: 0; visibility: hidden;
+      transition: opacity 0.5s ease, visibility 0.5s ease; text-align: center;
+    }
+    .slide.active { opacity: 1; visibility: visible; }
+
+    h1 { font-size: clamp(2.2rem, 5.5vw, 5rem); font-weight: 900; line-height: 1.1; letter-spacing: -0.03em; margin-bottom: 1.5rem; }
+    h2 { font-size: clamp(1.6rem, 3.8vw, 3.2rem); font-weight: 800; line-height: 1.15; letter-spacing: -0.02em; margin-bottom: 1.2rem; }
+    h3 { font-size: clamp(1.2rem, 2.5vw, 2rem); font-weight: 700; line-height: 1.2; margin-bottom: 1rem; }
+    p, li { font-size: clamp(1rem, 1.8vw, 1.5rem); line-height: 1.6; font-weight: 400; color: rgba(255,255,255,0.85); }
+
+    .green { color: var(--green); }
+    .red { color: var(--red); }
+    .dim { color: var(--dim); }
+    .green-glow { color: var(--green); text-shadow: 0 0 30px rgba(0,255,136,0.4), 0 0 60px rgba(0,255,136,0.15); }
+    .red-glow { color: var(--red); text-shadow: 0 0 30px rgba(255,51,51,0.4), 0 0 60px rgba(255,51,51,0.15); }
+
+    .card {
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      border-radius: 16px; padding: 2rem 2.5rem; max-width: 800px; width: 100%; backdrop-filter: blur(10px);
+    }
+    .card-green { border-color: rgba(0,255,136,0.2); box-shadow: var(--green-glow); }
+
+    .small-tag {
+      display: inline-block; background: rgba(0,255,136,0.1); color: var(--green);
+      font-size: 0.75rem; font-weight: 700; padding: 6px 16px; border-radius: 20px;
+      letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 1rem;
+    }
+    .red-tag { background: rgba(255,51,51,0.1); color: var(--red); }
+
+    .divider { width: 60px; height: 3px; background: var(--green); border-radius: 2px; margin: 1.5rem auto; }
+
+    .gradient-orb { position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.15; pointer-events: none; }
+    .orb-green { width: 400px; height: 400px; background: var(--green); top: -100px; right: -100px; }
+    .orb-red { width: 300px; height: 300px; background: var(--red); bottom: -80px; left: -80px; }
+
+    .recap-list { max-width: 750px; width: 100%; text-align: left; list-style: none; padding: 0; }
+    .recap-list li {
+      font-size: clamp(0.95rem, 1.5vw, 1.25rem); padding: 1rem 1.2rem; margin-bottom: 0.6rem;
+      background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px;
+      display: flex; align-items: center; gap: 0.8rem;
+    }
+    .recap-list li .icon { font-size: 1.3rem; flex-shrink: 0; }
+
+    .timeline { max-width: 650px; width: 100%; text-align: left; position: relative; padding-left: 2rem; }
+    .timeline::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: linear-gradient(to bottom, var(--green), rgba(0,255,136,0.1)); }
+    .timeline-item { position: relative; padding: 0.8rem 0 1.5rem 1.5rem; }
+    .timeline-item::before { content: ''; position: absolute; left: -2rem; top: 1.1rem; width: 10px; height: 10px; border-radius: 50%; background: var(--green); transform: translateX(calc(2rem - 4px)); }
+    .timeline-item .time { font-size: 0.8rem; color: var(--green); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.3rem; }
+    .timeline-item .desc { font-size: clamp(0.95rem, 1.3vw, 1.15rem); color: rgba(255,255,255,0.8); }
+
+    .cta-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.2rem; max-width: 500px; width: 100%; margin-top: 1.5rem; }
+    .cta-item { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 1rem 1.2rem; text-align: center; }
+    .cta-item .label { font-size: 0.7rem; color: var(--dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.3rem; }
+    .cta-item .value { font-size: 1.1rem; font-weight: 700; }
+
+    .whatsapp-btn {
+      display: inline-flex; align-items: center; gap: 0.6rem; background: #25D366; color: #fff;
+      font-size: 1.1rem; font-weight: 700; padding: 1rem 2.5rem; border-radius: 50px;
+      text-decoration: none; margin-top: 1.5rem; transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .whatsapp-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(37,211,102,0.3); }
+
+    .nav-counter { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%); font-size: 0.85rem; color: var(--dim); font-weight: 500; z-index: 100; font-variant-numeric: tabular-nums; }
+    .nav-arrows { position: fixed; bottom: 2rem; right: 2rem; display: flex; gap: 0.5rem; z-index: 100; }
+    .nav-btn { width: 44px; height: 44px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.05); color: var(--text); font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; backdrop-filter: blur(10px); }
+    .nav-btn:hover { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.3); }
+    .progress-bar { position: fixed; top: 0; left: 0; height: 3px; background: var(--green); transition: width 0.4s ease; z-index: 100; }
+    .logo-badge { position: fixed; top: 1.5rem; left: 1.5rem; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.15em; color: var(--dim); z-index: 100; text-transform: uppercase; }
+
+    .slide.active .animate-in { animation: fadeUp 0.6s ease forwards; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-in { opacity: 0; }
+    .delay-1 { animation-delay: 0.1s !important; }
+    .delay-2 { animation-delay: 0.25s !important; }
+    .delay-3 { animation-delay: 0.4s !important; }
+
+    /* ─── MOBILE FIRST: hasta 768px ─── */
+    @media (max-width: 768px) {
+      body { overflow-y: auto; overflow-x: hidden; height: auto; }
+      .deck { height: auto; position: relative; }
+
+      .slide {
+        position: relative; inset: auto;
+        opacity: 1; visibility: visible;
+        padding: 10vh 7vw 8vh;
+        min-height: 100svh;
+        min-height: 100vh;
+        scroll-snap-align: start;
+      }
+      .slide.active { opacity: 1; visibility: visible; }
+
+      /* Todos los elementos visibles en scroll */
+      .animate-in { opacity: 1 !important; animation: none !important; }
+
+      /* Scroll snap para que cada slide encaje */
+      .deck {
+        overflow-y: auto;
+        scroll-snap-type: y mandatory;
+        height: 100vh;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      /* Tipografia mas grande para mobile */
+      h1 { font-size: 2rem; margin-bottom: 1rem; }
+      h2 { font-size: 1.5rem; margin-bottom: 1rem; }
+      h3 { font-size: 1.2rem; }
+      p, li { font-size: 1rem; line-height: 1.5; }
+
+      /* Tags */
+      .small-tag { font-size: 0.7rem; padding: 5px 14px; margin-bottom: 0.8rem; }
+
+      /* Cards */
+      .card { padding: 1.5rem; border-radius: 12px; }
+
+      /* Recap list */
+      .recap-list li {
+        font-size: 0.95rem;
+        padding: 0.8rem 1rem;
+        margin-bottom: 0.5rem;
+        border-radius: 10px;
+      }
+      .recap-list li .icon { font-size: 1.1rem; }
+
+      /* Timeline */
+      .timeline { padding-left: 1.5rem; }
+      .timeline-item { padding: 0.6rem 0 1.2rem 1.2rem; }
+      .timeline-item .time { font-size: 0.75rem; }
+      .timeline-item .desc { font-size: 0.95rem; }
+      .timeline-item::before { transform: translateX(calc(1.5rem - 4px)); left: -1.5rem; }
+
+      /* CTA grid */
+      .cta-grid { grid-template-columns: 1fr; gap: 0.8rem; margin-top: 1.2rem; max-width: 100%; }
+      .cta-item { padding: 0.8rem 1rem; }
+      .cta-item .value { font-size: 1rem; }
+
+      /* WhatsApp boton mas grande y tactil */
+      .whatsapp-btn {
+        font-size: 1rem;
+        padding: 0.9rem 2rem;
+        width: 100%;
+        max-width: 320px;
+        justify-content: center;
+        margin-top: 1.2rem;
+      }
+
+      /* Orbs mas pequenos */
+      .orb-green { width: 250px; height: 250px; top: -60px; right: -60px; }
+      .orb-red { width: 200px; height: 200px; bottom: -50px; left: -50px; }
+
+      /* Ocultar navegacion de desktop */
+      .nav-arrows { display: none; }
+      .nav-counter { display: none; }
+      .progress-bar { display: none; }
+
+      /* Logo badge */
+      .logo-badge { top: 1rem; left: 1rem; font-size: 0.65rem; }
+
+      /* Divider */
+      .divider { margin: 1rem auto; }
+
+      /* Indicador de scroll */
+      .scroll-hint {
+        display: flex !important;
+      }
+    }
+
+    .scroll-hint {
+      display: none;
+      position: absolute;
+      bottom: 3vh;
+      left: 50%;
+      transform: translateX(-50%);
+      flex-direction: column;
+      align-items: center;
+      gap: 0.4rem;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    .scroll-hint span {
+      font-size: 0.75rem;
+      color: var(--dim);
+      letter-spacing: 0.05em;
+    }
+
+    .scroll-hint .arrow {
+      width: 20px;
+      height: 20px;
+      border-left: 2px solid var(--dim);
+      border-bottom: 2px solid var(--dim);
+      transform: rotate(-45deg);
+      animation: bounce 1.5s ease-in-out infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: rotate(-45deg) translateY(0); opacity: 0.4; }
+      50% { transform: rotate(-45deg) translateY(6px); opacity: 1; }
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 1; }
+    }
+
+    /* ─── Pantallas muy pequenas (iPhone SE, etc) ─── */
+    @media (max-width: 380px) {
+      .slide { padding: 8vh 5vw 6vh; }
+      h1 { font-size: 1.7rem; }
+      h2 { font-size: 1.3rem; }
+      .recap-list li { font-size: 0.88rem; padding: 0.7rem 0.8rem; }
+      .whatsapp-btn { font-size: 0.95rem; padding: 0.85rem 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="progress-bar" id="progress"></div>
+<div class="logo-badge">Alek Agency</div>
+
+<div class="deck" id="deck">
+
+  <!-- SLIDE 1: Saludo -->
+  <div class="slide active">
+    <div class="gradient-orb orb-green"></div>
+    <div class="animate-in">
+      <span class="small-tag">Resumen de reunion</span>
+    </div>
+    <h1 class="animate-in delay-1">Gracias por tu <span class="green-glow">tiempo</span></h1>
+    <p class="animate-in delay-2" style="font-size:clamp(1.1rem,2vw,1.6rem); color:rgba(255,255,255,0.6); max-width:600px;">
+      Aqui tienes los puntos clave de nuestra platica y los proximos pasos.
+    </p>
+    <div class="divider animate-in delay-3"></div>
+    <div class="scroll-hint">
+      <span>Desliza hacia arriba</span>
+      <div class="arrow"></div>
+    </div>
+  </div>
+
+  <!-- SLIDE 2: Lo que detectamos -->
+  <div class="slide">
+    <div class="gradient-orb orb-red"></div>
+    <div class="animate-in">
+      <span class="small-tag red-tag">Lo que detectamos</span>
+    </div>
+    <h2 class="animate-in delay-1" style="max-width:750px;">
+      Hoy estas <span class="red-glow">perdiendo ventas</span> porque:
+    </h2>
+    <ul class="recap-list animate-in delay-2">
+      <li><span class="icon red">1.</span> Prospectos que no reciben respuesta a tiempo</li>
+      <li><span class="icon red">2.</span> Seguimiento manual que depende de la memoria</li>
+      <li><span class="icon red">3.</span> Tiempo valioso invertido en tareas repetitivas</li>
+    </ul>
+  </div>
+
+  <!-- SLIDE 3: Lo que te ofrecemos -->
+  <div class="slide">
+    <div class="gradient-orb orb-green"></div>
+    <div class="animate-in">
+      <span class="small-tag">La solucion</span>
+    </div>
+    <h2 class="animate-in delay-1" style="max-width:700px;">
+      Un sistema que trabaja <span class="green-glow">24/7</span> por ti
+    </h2>
+    <ul class="recap-list animate-in delay-2">
+      <li><span class="icon green">&#10003;</span> Respuesta instantanea a cada prospecto</li>
+      <li><span class="icon green">&#10003;</span> Calificacion automatica — solo ves compradores reales</li>
+      <li><span class="icon green">&#10003;</span> Agendamiento y seguimiento sin intervencion manual</li>
+    </ul>
+  </div>
+
+  <!-- SLIDE 4: El numero que importa -->
+  <div class="slide">
+    <div class="animate-in">
+      <span class="small-tag">El numero que importa</span>
+    </div>
+    <h2 class="animate-in delay-1" style="max-width:700px;">Con recuperar <span class="green-glow">1 sola venta</span> que hoy pierdes por no responder a tiempo:</h2>
+    <p class="animate-in delay-2" style="margin-top:1rem; font-size:clamp(1.1rem,2vw,1.6rem); color:rgba(255,255,255,0.7); max-width:600px;">
+      Tu comision por esa venta ya cubre <span class="green bold">meses de inversion</span> en el sistema.
+    </p>
+    <h3 class="animate-in delay-3 green" style="margin-top:2rem;">Sin importar el tipo de propiedad, los numeros siempre juegan a tu favor.</h3>
+  </div>
+
+  <!-- SLIDE 5: Proximos pasos -->
+  <div class="slide">
+    <div class="animate-in">
+      <span class="small-tag">Proximos pasos</span>
+    </div>
+    <h2 class="animate-in delay-1" style="max-width:700px; margin-bottom:2rem;">
+      Asi de facil es <span class="green-glow">comenzar</span>
+    </h2>
+    <div class="timeline animate-in delay-2">
+      <div class="timeline-item">
+        <div class="time">Paso 1 — Hoy</div>
+        <div class="desc">Confirmas el paquete ideal para tu inmobiliaria</div>
+      </div>
+      <div class="timeline-item">
+        <div class="time">Paso 2 — Semana 1</div>
+        <div class="desc">Agendamos una reunion para que nos compartas acceso a tu informacion</div>
+      </div>
+      <div class="timeline-item">
+        <div class="time">Paso 3 — Semana 2-3</div>
+        <div class="desc">Instalamos todo y tu sistema empieza a operar 24/7</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 6: Urgencia + CTA -->
+  <div class="slide">
+    <div class="gradient-orb orb-green"></div>
+    <div class="animate-in">
+      <span class="small-tag">No lo dejes para despues</span>
+    </div>
+    <h2 class="animate-in delay-1" style="max-width:700px;">
+      Cada dia sin el sistema, tus prospectos eligen a <span class="red-glow">tu competencia</span>
+    </h2>
+    <p class="animate-in delay-2 dim" style="margin-top:1rem; margin-bottom:1.5rem;">Agendemos una segunda reunion para platicar los detalles y arrancar.</p>
+
+    <div class="cta-grid animate-in delay-2">
+      <div class="cta-item">
+        <div class="label">Web</div>
+        <div class="value">alekagency.com</div>
+      </div>
+      <div class="cta-item">
+        <div class="label">WhatsApp</div>
+        <div class="value green">246 195 7348</div>
+      </div>
+    </div>
+
+    <a href="https://wa.me/5212461957348?text=Hola%20Alek%2C%20quiero%20arrancar%20con%20el%20sistema%20de%20automatizacion" class="whatsapp-btn animate-in delay-3" target="_blank" rel="noopener">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      Quiero arrancar ahora
+    </a>
+  </div>
+
+</div>
+
+<!-- Navigation -->
+<div class="nav-counter" id="counter">1 / 6</div>
+<div class="nav-arrows">
+  <button class="nav-btn" onclick="prev()" aria-label="Anterior">&#8592;</button>
+  <button class="nav-btn" onclick="next()" aria-label="Siguiente">&#8594;</button>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const total = slides.length;
+  let current = 0;
+
+  function go(index) {
+    if (index < 0 || index >= total) return;
+    slides[current].classList.remove('active');
+    current = index;
+    slides[current].classList.add('active');
+    document.getElementById('counter').textContent = `${current + 1} / ${total}`;
+    document.getElementById('progress').style.width = `${((current + 1) / total) * 100}%`;
+  }
+
+  function next() { go(current + 1); }
+  function prev() { go(current - 1); }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') { e.preventDefault(); next(); }
+    if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); prev(); }
+    if (e.key === 'Home') { e.preventDefault(); go(0); }
+    if (e.key === 'End') { e.preventDefault(); go(total - 1); }
+  });
+
+  let touchStartX = 0, touchStartY = 0;
+  document.addEventListener('touchstart', (e) => { touchStartX = e.changedTouches[0].screenX; touchStartY = e.changedTouches[0].screenY; }, { passive: true });
+  document.addEventListener('touchend', (e) => {
+    const dx = e.changedTouches[0].screenX - touchStartX;
+    const dy = e.changedTouches[0].screenY - touchStartY;
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 50) { dx < 0 ? next() : prev(); }
+  }, { passive: true });
+
+  go(0);
+</script>
+
+</body>
+</html>
